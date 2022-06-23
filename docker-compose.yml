@@ -1,0 +1,36 @@
+version: "3"
+services:
+  database:
+    image: "postgres:latest"
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: postgres # The PostgreSQL user (useful to connect to the database)
+      POSTGRES_PASSWORD: postgres # The PostgreSQL password (useful to connect to the database)
+      POSTGRES_DB: postgres # The PostgreSQL default database (automatically created at first launch)
+    volumes:
+      - /var/lib/postgresql/data
+
+  cachet:
+    build:
+      context: .
+      args:
+        - cachet_ver=2.4
+    ports:
+      - 80:8000
+    links:
+      - database:postgres
+
+    environment:
+      - DB_DRIVER=pgsql
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_DATABASE=postgres
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=postgres
+      - DB_PREFIX=chq_
+      - APP_KEY=base64:5y5GPFbENFZQKILfDOlSd/wpcfNX50Ror1XSDJ4jlCY=
+      - APP_LOG=errorlog
+      - APP_ENV=${APP_ENV:-production}
+      - APP_DEBUG=false
+      - DEBUG=false
